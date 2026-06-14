@@ -1,0 +1,29 @@
+# Local dev overrides — hot reload. Used by: make dev
+
+services:
+  api:
+    volumes:
+      - ./app:/app/app
+    command:
+      [
+        "uv",
+        "run",
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "${APP_PORT:-8000}",
+        "--reload",
+      ]
+
+  web:
+    build:
+      context: ./frontend
+      target: dev
+    image: worthit-web-dev
+    environment:
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - ./frontend:/app
+      - web_node_modules:/app/node_modules

@@ -1,29 +1,11 @@
-# Production overrides — merged on top of compose.yaml during deploy.
+# Homelab production overrides — used by scripts/deploy.sh
 
 services:
   api:
     restart: always
-    volumes: []
-    command:
-      [
-        "uv",
-        "run",
-        "uvicorn",
-        "app.main:app",
-        "--host",
-        "0.0.0.0",
-        "--port",
-        "${APP_PORT:-8000}",
-      ]
 
   web:
     restart: always
-    build:
-      context: ./frontend
-      target: prod
-    volumes: []
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:${HOST_PORT:-8000}
 
   db:
     restart: always
