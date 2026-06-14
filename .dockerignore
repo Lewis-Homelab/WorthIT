@@ -1,0 +1,14 @@
+# Files excluded from the Docker build context (COPY . . in Dockerfile).
+# Keeps images small and avoids leaking local dev artifacts into containers.
+
+.venv           # Local virtualenv — deps are installed fresh inside the image
+.git            # Git history not needed in the container
+.github         # CI workflows not needed at runtime
+__pycache__     # Python bytecode cache
+*.py[cod]       # Compiled Python files
+.pytest_cache   # Test cache
+.env            # Secrets stay out of the image
+.DS_Store       # macOS metadata
+docs            # Documentation not needed at runtime
+TEMPLATE.md     # Template guide not needed at runtime
+LICENSE         # License file not needed at runtime

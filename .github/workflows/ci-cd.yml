@@ -1,0 +1,78 @@
+# Unified CI/CD pipeline — test, build, and deploy in a single workflow run.
+#
+# Job graph:
+#   test ──┐
+#          ├──► deploy (push to main only, after test + build succeed)
+#   build ─┘
+#
+# GitHub configuration (see docs/secrets.md):
+#   Organization secrets (shared across all homelab apps):
+#     TS_OAUTH_CLIENT_ID, TS_OAUTH_SECRET, HOMELAB_HOST, HOMELAB_USER, HOMELAB_SSH_KEY
+#   Organization variables (shared):
+#     TS_TAGS
+#   Repository variable (per app — the only repo-specific setting):
+#     DEPLOY_PATH
+
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-cd-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - run: uv sync --frozen
+      - run: uv run pytest
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker compose --env-file config.env build
+
+  deploy:
+    needs: [test, build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v4
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: ${{ vars.TS_TAGS }}
+          ping: ${{ secrets.HOMELAB_HOST }}
+
+      - name: Deploy to homelab
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HOMELAB_HOST }}
+          username: ${{ secrets.HOMELAB_USER }}
+          key: ${{ secrets.HOMELAB_SSH_KEY }}
+          # git pull MUST happen here in the workflow script, not only inside deploy.sh.
+          # Otherwise old deploy.sh on the server never updates the repo (chicken-and-egg).
+          script: |
+            set -euo pipefail
+            cd "${{ vars.DEPLOY_PATH }}"
+            echo "Commit before pull: $(git rev-parse --short HEAD)"
+            git pull origin main
+            echo "Commit after pull:  $(git rev-parse --short HEAD)"
+            chmod +x scripts/deploy.sh
+            [[ -f scripts/load-env.sh ]] && chmod +x scripts/load-env.sh
+            DEPLOY_PULL=0 ./scripts/deploy.sh

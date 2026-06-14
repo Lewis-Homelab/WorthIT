@@ -1,0 +1,10 @@
+# Files and directories excluded from git.
+# Prevents local artifacts and secrets from being committed.
+
+.venv/          # Python virtual environment (created by uv sync)
+__pycache__/    # Python bytecode cache
+*.py[cod]       # Compiled Python files
+*.egg-info/     # Package metadata from builds
+.pytest_cache/  # pytest cache
+.env            # Optional secrets and local overrides (config.env is committed)
+.DS_Store       # macOS folder metadata

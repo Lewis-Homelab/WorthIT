@@ -1,0 +1,53 @@
+# =============================================================================
+# Docker Compose — base configuration
+# =============================================================================
+#
+# Used for:
+#   - Local dev:     make dev  (or: docker compose up --build)
+#   - Homelab deploy: scripts/deploy.sh merges this with compose.prod.yaml
+#
+# All app-specific values come from config.env (committed, safe to share).
+# Makefile and deploy.sh pass: docker compose --env-file config.env
+# Defaults after :- are fallbacks if a variable is unset.
+#
+# Do NOT hardcode app name or ports here — edit config.env instead.
+# =============================================================================
+
+services:
+  # Service key is always "app" (fixed). Do not rename — compose.prod.yaml references
+  # this same key. The visible container name comes from APP_NAME in config.env.
+  app:
+    # Build image from Dockerfile in the repo root
+    build: .
+
+    # Docker container name on the host (docker ps). Set APP_NAME in config.env.
+    container_name: ${APP_NAME:-hello-homelab}
+
+    # Restart unless explicitly stopped. compose.prod.yaml overrides to "always" on deploy.
+    restart: unless-stopped
+
+    # Publish container port to the host.
+    #   HOST_PORT — what you open in a browser (e.g. http://localhost:5050)
+    #   APP_PORT  — port the app listens on inside the container
+    ports:
+      - "${HOST_PORT:-5050}:${APP_PORT:-5001}"
+
+    # Passed into the container so the app and healthcheck use the same port/path.
+    # app/main.py reads APP_PORT; HEALTH_PATH sets the /health route location.
+    environment:
+      APP_PORT: ${APP_PORT:-5001}
+      HEALTH_PATH: ${HEALTH_PATH:-/health}
+
+    # Docker runs this inside the container to mark it healthy/unhealthy.
+    # Uses curl (installed in Dockerfile) — works for any HTTP app, not just Flask.
+    #
+    # $$APP_PORT and $$HEALTH_PATH become $APP_PORT and $HEALTH_PATH in the shell
+    # (Compose escapes $ as $$). Values come from the environment: block above.
+    #
+    # start_period: grace time after start before failed checks count against retries.
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:$$APP_PORT$$HEALTH_PATH >/dev/null || exit 1"]
+      interval: 30s      # time between checks once the container is running
+      timeout: 5s        # max time for a single check to complete
+      retries: 3         # consecutive failures before marking unhealthy
+      start_period: 10s  # ignore failures during initial startup

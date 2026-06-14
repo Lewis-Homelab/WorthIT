@@ -1,0 +1,9 @@
+# Production overrides — merged on top of compose.yaml during deploy.
+
+services:
+  app:
+    restart: always
+
+    # --- Optional: registry-based deploy ---
+    # Uncomment to pull a pre-built image instead of building on the server.
+    # image: ${IMAGE:-ghcr.io/youruser/${APP_NAME:-hello-homelab}}:${GIT_SHA:-latest}
