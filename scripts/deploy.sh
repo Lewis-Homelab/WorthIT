@@ -23,6 +23,7 @@ fi
 
 run_deploy() {
   local label="$1"
+  mkdir -p /home/lewis/homelab/data/WorthIt/postgres
   echo "Starting containers (${label})..."
   docker compose "${COMPOSE_ENV[@]}" "${COMPOSE_FILES[@]}" up -d --build
 

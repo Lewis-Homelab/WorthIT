@@ -2,10 +2,16 @@
 
 COMPOSE_ENV := --env-file config.env $(if $(wildcard .env),--env-file .env,)
 
-.PHONY: dev test build deploy init
+.PHONY: dev test build deploy down logs api-shell db-shell
 
 dev:
 	docker compose $(COMPOSE_ENV) up --build
+
+down:
+	docker compose $(COMPOSE_ENV) down
+
+logs:
+	docker compose $(COMPOSE_ENV) logs -f
 
 test:
 	uv run pytest
@@ -16,6 +22,8 @@ build:
 deploy:
 	./scripts/deploy.sh
 
-# Initialize a new project: make init APP=my-api PORT=8080
-init:
-	./scripts/init-project.sh $(APP) $(PORT)
+api-shell:
+	docker compose $(COMPOSE_ENV) exec api bash
+
+db-shell:
+	docker compose $(COMPOSE_ENV) exec db psql -U $$(grep '^POSTGRES_USER=' config.env | cut -d= -f2) -d $$(grep '^POSTGRES_DB=' config.env | cut -d= -f2)

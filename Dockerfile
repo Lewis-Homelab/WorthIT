@@ -1,10 +1,9 @@
-# Container image — port and health path are configured via .env / compose environment.
+# FastAPI backend image
 
 FROM python:3.12-slim
 
 WORKDIR /app
 
-# curl is used by the Docker healthcheck (stack-agnostic)
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/*
@@ -17,7 +16,7 @@ RUN uv sync --frozen --no-install-project
 COPY . .
 RUN uv sync --frozen
 
-ENV APP_PORT=5001
-EXPOSE 5001
+ENV APP_PORT=8000
+EXPOSE 8000
 
-CMD ["uv", "run", "python", "app/main.py"]
+CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

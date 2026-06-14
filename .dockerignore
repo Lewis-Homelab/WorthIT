@@ -9,6 +9,9 @@ __pycache__     # Python bytecode cache
 .pytest_cache   # Test cache
 .env            # Secrets stay out of the image
 .DS_Store       # macOS metadata
-docs            # Documentation not needed at runtime
+.docs            # Documentation not needed at runtime
 TEMPLATE.md     # Template guide not needed at runtime
 LICENSE         # License file not needed at runtime
+frontend/node_modules
+frontend/.next
+node_modules

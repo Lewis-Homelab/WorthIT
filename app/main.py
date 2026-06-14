@@ -1,28 +1,35 @@
-"""
-Hello-Homelab Flask application.
+from contextlib import asynccontextmanager
 
-Port and health path are configured via APP_PORT and HEALTH_PATH in config.env.
-"""
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-import os
-
-from flask import Flask, jsonify
-
-app = Flask(__name__)
-
-APP_PORT = int(os.environ.get("APP_PORT", "5001"))
-HEALTH_PATH = os.environ.get("HEALTH_PATH", "/health")
+from app.config import settings
+from app.database import Base, engine
+from app.routers import health, places
 
 
-@app.route("/")
-def home():
-    return "Hello from the homelab!"
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+    await engine.dispose()
 
 
-@app.route(HEALTH_PATH)
-def health():
-    return jsonify(status="ok"), 200
+app = FastAPI(
+    title="WorthIT API",
+    description="High-value experience planning — joy per pound",
+    version="0.1.0",
+    lifespan=lifespan,
+)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=APP_PORT)
+app.include_router(health.router)
+app.include_router(places.router)

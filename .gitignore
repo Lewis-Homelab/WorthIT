@@ -7,4 +7,7 @@ __pycache__/    # Python bytecode cache
 *.egg-info/     # Package metadata from builds
 .pytest_cache/  # pytest cache
 .env            # Optional secrets and local overrides (config.env is committed)
+node_modules/
+frontend/node_modules/
+frontend/.next/
 .DS_Store       # macOS folder metadata

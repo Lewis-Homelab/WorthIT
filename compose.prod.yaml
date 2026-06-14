@@ -1,9 +1,29 @@
 # Production overrides — merged on top of compose.yaml during deploy.
 
 services:
-  app:
+  api:
     restart: always
+    volumes: []
+    command:
+      [
+        "uv",
+        "run",
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "${APP_PORT:-8000}",
+      ]
 
-    # --- Optional: registry-based deploy ---
-    # Uncomment to pull a pre-built image instead of building on the server.
-    # image: ${IMAGE:-ghcr.io/youruser/${APP_NAME:-hello-homelab}}:${GIT_SHA:-latest}
+  web:
+    restart: always
+    build:
+      context: ./frontend
+      target: prod
+    volumes: []
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:${HOST_PORT:-8000}
+
+  db:
+    restart: always
