@@ -70,9 +70,11 @@ jobs:
           script: |
             set -euo pipefail
             cd "${{ vars.DEPLOY_PATH }}"
-            echo "Commit before pull: $(git rev-parse --short HEAD)"
-            git pull origin main
-            echo "Commit after pull:  $(git rev-parse --short HEAD)"
+            echo "Commit before sync: $(git rev-parse --short HEAD)"
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+            echo "Commit after sync:  $(git rev-parse --short HEAD)"
             chmod +x scripts/deploy.sh
             [[ -f scripts/load-env.sh ]] && chmod +x scripts/load-env.sh
             DEPLOY_PULL=0 ./scripts/deploy.sh

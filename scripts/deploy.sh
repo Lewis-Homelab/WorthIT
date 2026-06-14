@@ -46,8 +46,10 @@ run_deploy() {
 PREVIOUS_COMMIT=$(git rev-parse HEAD)
 
 if [[ "${DEPLOY_PULL:-0}" == "1" ]]; then
-  echo "Pulling latest from origin/${DEPLOY_BRANCH}..."
-  git pull origin "${DEPLOY_BRANCH}"
+  echo "Syncing latest from origin/${DEPLOY_BRANCH}..."
+  git fetch origin "${DEPLOY_BRANCH}"
+  git reset --hard "origin/${DEPLOY_BRANCH}"
+  git clean -fd
 fi
 
 if run_deploy "deploy"; then
