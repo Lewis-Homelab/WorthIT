@@ -26,6 +26,6 @@ load_app_env() {
   : "${DEPLOY_BRANCH:=main}"
 
   export APP_NAME APP_PORT HOST_PORT HEALTH_PATH DEPLOY_BRANCH
-  export WEB_HOST_PORT="${WEB_HOST_PORT:-3000}"
+  export WEB_HOST_PORT="${WEB_HOST_PORT:-3001}"
   export HEALTH_URL="${HEALTH_URL:-http://localhost:${HOST_PORT}${HEALTH_PATH}}"
 }

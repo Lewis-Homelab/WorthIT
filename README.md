@@ -15,7 +15,7 @@ make dev
 
 | URL | Purpose |
 |-----|---------|
-| http://localhost:3000 | Web UI |
+| http://localhost:3001 | Web UI |
 | http://localhost:8000/docs | API docs (Swagger) |
 | http://localhost:8000/health | API health |
 | http://localhost:8000/places | Places CRUD |
@@ -60,7 +60,7 @@ make test
 |----------|---------|
 | `APP_NAME` | `worthit` |
 | `HOST_PORT` | `8000` (API) |
-| `WEB_HOST_PORT` | `3000` |
+| `WEB_HOST_PORT` | `3001` |
 | `POSTGRES_*` | `worthit` / `worthit` / `worthit` |
 
 ---
