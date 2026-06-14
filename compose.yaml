@@ -19,7 +19,7 @@ services:
     ports:
       - "${POSTGRES_HOST_PORT:-5432}:5432"
     volumes:
-      - /home/lewis/homelab/data/WorthIt/postgres:/var/lib/postgresql/data
+      - /home/lewis/homelab/data/WorthIT/postgres:/var/lib/postgresql/data
     healthcheck:
       test:
         [
