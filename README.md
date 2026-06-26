@@ -13,15 +13,35 @@ cp .env.example .env   # optional: add GOOGLE_PLACES_API_KEY
 make dev
 ```
 
+Open http://homelab:3050 from any device on your Tailscale network (e.g. your Mac).
+Set your budget and interests, then click **Show me ideas**.
+The first request can take 1–2 minutes while the API loads the walking graph.
+Ensure `data/raw/` contains the Camden parquet files (see sandbox notebooks).
+
+After changing `NEXT_PUBLIC_API_URL` in config.env, restart the web container:
+`docker compose --env-file config.env -f compose.yaml -f compose.dev.yaml up -d --build web`
+
 | URL | Purpose |
 |-----|---------|
-| http://localhost:3050 | Web UI |
-| http://localhost:8000/docs | API docs (Swagger) |
-| http://localhost:8000/health | API health |
-| http://localhost:8000/places | Places CRUD |
-| localhost:5432 | PostgreSQL |
+| http://homelab:3050 | Web UI — browse ranked day plans |
+| http://homelab:8000/docs | API docs (Swagger) |
+| http://homelab:8000/health | API health |
+| http://homelab:8000/recommendations/day-plans | Ranked day-plan cards (API) |
+| http://homelab:8000/places | Places CRUD |
 
-Ports are configured in [config.env](config.env).
+`homelab` is the Tailscale MagicDNS name from [config.env](config.env) (`TAILNET_HOST`).
+Ports are configured in config.env (`HOST_PORT`, `WEB_HOST_PORT`).
+
+### Access via Tailscale
+
+Docker runs on the homelab server. Browse using the MagicDNS hostname (not `localhost` on your Mac):
+
+- **Web UI:** http://homelab:3050
+- **API:** http://homelab:8000
+
+`NEXT_PUBLIC_API_URL` is set to `http://homelab:8000` so the browser on your Mac calls the API over Tailscale, not `localhost`.
+
+If your MagicDNS name differs, update `TAILNET_HOST` and `NEXT_PUBLIC_API_URL` in `config.env`, then rebuild the web service.
 
 ---
 

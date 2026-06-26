@@ -8,8 +8,10 @@ RUN npm install
 FROM base AS dev
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+COPY docker-entrypoint.dev.sh /usr/local/bin/docker-entrypoint.dev.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.dev.sh
 EXPOSE 3050
-CMD ["npm", "run", "dev"]
+ENTRYPOINT ["docker-entrypoint.dev.sh"]
 
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules

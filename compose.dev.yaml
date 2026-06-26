@@ -4,6 +4,10 @@ services:
   api:
     volumes:
       - ./app:/app/app
+      # Mount local parquet datasets so recommendations work in Docker.
+      - ./data:/app/data:ro
+    environment:
+      DATA_DIR: /app/data
     command:
       [
         "uv",
@@ -24,6 +28,7 @@ services:
     image: worthit-web-dev
     environment:
       WATCHPACK_POLLING: "true"
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://homelab:8000}
     volumes:
       - ./frontend:/app
       - web_node_modules:/app/node_modules
