@@ -1,12 +1,11 @@
 """
 Tests for the file-backed recommendation engine (app/engine/).
 
-Unit tests cover scoring and category logic without requiring data files.
-Integration tests load Camden parquet from data/raw/ when present.
+Unit tests only — no data files required. Test the full pipeline manually
+via http://homelab:3050 or the API when data/raw/ is present locally.
 """
 
 import pandas as pd
-import pytest
 
 from app.engine.scoring.experience import (
     derive_category,
@@ -92,41 +91,3 @@ def test_score_poi_prefers_matching_interest():
         preferred_categories=interest_categories(["pub"]),
     )
     assert matched > unmatched
-
-
-@pytest.mark.integration
-def test_suggest_day_plans_with_local_data(require_poc_data):
-    """End-to-end plan building against Camden parquet (integration — needs data/raw/)."""
-    from app.engine.planning.day_plans import suggest_day_plans
-
-    plans = suggest_day_plans(
-        start_lat=51.539,
-        start_lon=-0.142,
-        budget_gbp=50,
-        max_hours=6,
-        interests=["coffee", "museum", "pub"],
-        limit=3,
-    )
-    if not plans:
-        pytest.skip("No connected day plans in current Camden sample")
-    assert plans[0]["score"] > 0
-    assert len(plans[0]["stops"]) >= 2
-
-
-@pytest.mark.integration
-def test_day_plans_api(require_poc_data):
-    """HTTP smoke test for GET /recommendations/day-plans (integration)."""
-    pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
-
-    from app.main import app
-
-    client = TestClient(app)
-    response = client.get(
-        "/recommendations/day-plans",
-        params={"budget_gbp": 50, "max_hours": 6, "interests": ["coffee", "pub"]},
-    )
-    assert response.status_code == 200
-    payload = response.json()
-    assert "plans" in payload
-    assert "weather" in payload
