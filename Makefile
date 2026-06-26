@@ -22,6 +22,9 @@ logs:
 	docker compose $(COMPOSE_ENV) $(COMPOSE_DEV) logs -f
 
 test:
+	uv run pytest -m "not integration"
+
+test-all:
 	uv run pytest
 
 build:

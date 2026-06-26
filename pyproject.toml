@@ -27,3 +27,6 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+markers = [
+    "integration: requires data/raw parquet files; auto-skipped when absent",
+]

@@ -36,7 +36,8 @@ jobs:
           enable-cache: true
 
       - run: uv sync --frozen
-      - run: uv run pytest
+      # Unit tests only — integration tests need gitignored data/raw/ parquet files
+      - run: uv run pytest -m "not integration"
 
   build:
     runs-on: ubuntu-latest

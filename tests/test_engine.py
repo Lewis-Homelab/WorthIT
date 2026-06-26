@@ -94,8 +94,9 @@ def test_score_poi_prefers_matching_interest():
     assert matched > unmatched
 
 
-def test_suggest_day_plans_with_local_data():
-    """End-to-end plan building against Camden parquet (skipped if data missing)."""
+@pytest.mark.integration
+def test_suggest_day_plans_with_local_data(require_poc_data):
+    """End-to-end plan building against Camden parquet (integration — needs data/raw/)."""
     from app.engine.planning.day_plans import suggest_day_plans
 
     plans = suggest_day_plans(
@@ -112,8 +113,9 @@ def test_suggest_day_plans_with_local_data():
     assert len(plans[0]["stops"]) >= 2
 
 
-def test_day_plans_api():
-    """HTTP smoke test for GET /recommendations/day-plans."""
+@pytest.mark.integration
+def test_day_plans_api(require_poc_data):
+    """HTTP smoke test for GET /recommendations/day-plans (integration)."""
     pytest.importorskip("fastapi")
     from fastapi.testclient import TestClient
 
@@ -124,8 +126,6 @@ def test_day_plans_api():
         "/recommendations/day-plans",
         params={"budget_gbp": 50, "max_hours": 6, "interests": ["coffee", "pub"]},
     )
-    if response.status_code == 503:
-        pytest.skip("POC data files not present in test environment")
     assert response.status_code == 200
     payload = response.json()
     assert "plans" in payload
