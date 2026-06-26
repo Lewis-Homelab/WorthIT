@@ -1,0 +1,108 @@
+You are assisting with the MoveIT project.
+
+Project purpose:
+MoveIT is an AI-powered location recommendation and itinerary platform. It helps users discover high-value local activities by combining places, walking routes, time constraints, preferences, and scoring logic.
+
+Core product principles:
+- Prioritise simple, useful features over complex architecture.
+- Prefer free, open-source, and self-hostable tools where practical.
+- The app should be runnable via docker
+- Avoid vendor lock-in unless there is a clear reason.
+- Optimise for clear recommendations, explainability, and practical user value.
+
+Technical principles:
+- Write simple, production-ready code.
+- Prefer boring, reliable solutions over clever abstractions.
+- Keep functions small and focused.
+- Avoid premature optimisation, but do not write obviously inefficient code.
+- Do not over-engineer early prototypes.
+- Make code easy to test, debug, and replace.
+- Prefer explicit logic over magic.
+- Avoid hidden global state.
+- Avoid hard-coded absolute paths.
+- Keep secrets out of code.
+
+Python standards:
+- Use modern Python.
+- Use type hints for function arguments and return values.
+- Use pathlib instead of os.path.
+- Use dataclasses or pydantic models where they improve clarity.
+- Use logging instead of print() for application code.
+- Use clear variable names.
+- Add comments where the reason is not obvious.
+- Do not comment every line.
+- Prefer readable pandas / GeoPandas operations over overly clever one-liners.
+- Handle missing data and empty inputs defensively.
+- Raise clear exceptions with useful messages.
+- Avoid broad except blocks unless there is a clear reason.
+- Keep notebooks exploratory; move reusable logic into scripts or modules.
+
+Geospatial and routing rules:
+- Walking distance means network distance, not straight-line distance.
+- Use haversine distance only for approximate filtering or nearest-neighbour snapping.
+- Store edge weights in metres unless explicitly stated otherwise.
+- Clearly distinguish metres, kilometres, seconds, and minutes.
+- Prefer OpenStreetMap-derived data where possible.
+- Use GeoPandas for geospatial data.
+- Use NetworkX for early graph experiments.
+- If graph performance becomes a bottleneck, suggest specialised routing engines such as OSRM, Valhalla, or GraphHopper.
+- Keep POI snapping logic explicit and reproducible.
+- Validate coordinate columns before using them.
+- Assume latitude/longitude are WGS84 unless stated otherwise.
+
+Data engineering principles:
+- Keep raw data, processed data, and outputs separate.
+- Do not mutate raw data files.
+- Prefer reproducible pipelines.
+- Make file paths configurable.
+- Use Parquet/GeoParquet for local analytical datasets.
+- Add lightweight validation checks after important transformations.
+- Log row counts, dropped records, and assumptions.
+- Avoid silently ignoring bad data.
+
+Project structure:
+
+Docker and server rules:
+- Prefer Docker Compose for services that should keep running.
+- Keep each service isolated.
+- Do not install random dependencies globally on the host.
+- Use .env files for local configuration.
+- Never commit .env files or secrets.
+- Assume the app may be accessed from a phone via Tailscale.
+- Prefer simple deployment commands that work on an Ubuntu home server.
+
+Code quality:
+- Code should be readable by a junior developer.
+- Include concise comments explaining non-obvious decisions.
+- Include docstrings for public functions.
+- Avoid unnecessary classes.
+- Avoid large functions.
+- Avoid duplicated logic.
+- Prefer small composable functions.
+- Prefer clear errors over silent failures.
+- Include examples when adding reusable utilities.
+- When modifying existing code, preserve working behaviour unless asked to change it.
+
+Testing:
+- Add simple tests for important logic.
+- Use pytest for Python tests.
+- Test edge cases such as empty inputs, missing columns, invalid coordinates, and disconnected graph nodes.
+- Keep tests practical and lightweight.
+- Do not create excessive test scaffolding for early experiments.
+
+Response style:
+- Be concise but complete.
+- Explain changes in plain English.
+- When suggesting code, provide complete usable snippets.
+- Prefer step-by-step implementation plans for larger changes.
+- Ask clarifying questions only when necessary.
+- If requirements are ambiguous, make a reasonable assumption and state it.
+- Do not rewrite large parts of the project unless specifically asked.
+
+Important defaults:
+- Simplicity first.
+- Production-ready where reasonable.
+- Clear comments.
+- Reproducible data processing.
+- No hidden assumptions.
+- No unnecessary complexity.

@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import Base, engine
-from app.routers import health, places
+from app.routers import health, places, recommendations
 
 
 @asynccontextmanager
@@ -33,3 +33,5 @@ app.add_middleware(
 
 app.include_router(health.router)
 app.include_router(places.router)
+# File-backed recommendation engine (POC — reads from data/raw/).
+app.include_router(recommendations.router)
